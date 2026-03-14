@@ -1,97 +1,55 @@
 ---
 
-# Node.js + Express Cheat Sheet — Condensed & Practical
+# Node.js + Express Cheat Sheet
 
 ## Table of Contents
 
-1. Node Philosophy
-2. Project Setup
-3. File Structure
-4. Core Node Concepts
-5. Express Basics
-6. Routes
-7. Request / Response
-8. JSON APIs
-9. Middleware
-10. Static Files (frontend)
-11. Forms & POST data
-12. Query Parameters
-13. Environment Variables
-14. Calling Python Scripts
-15. Async / Await
-16. Error Handling
-17. Logging
-18. Simple Frontend Interaction
-19. Fetch API (client → server)
-20. Running the Server
-21. Deployment Basics
+1. [Node Philosophy](#node-philosophy)
+2. [Project Setup](#project-setup)
+3. [File Structure](#file-structure)
+4. [Core Node Concepts](#core-node-concepts)
+5. [Express Basics](#express-basics)
+6. [Routes](#routes)
+7. [Request / Response](#request--response)
+8. [JSON APIs](#json-apis)
+9. [Middleware](#middleware)
+10. [Static Files](#static-files)
+11. [Forms & POST Data](#forms--post-data)
+12. [Query Parameters](#query-parameters)
+13. [Environment Variables](#environment-variables)
+14. [Calling Python Scripts](#calling-python-scripts)
+15. [Async / Await](#async--await)
+16. [Error Handling](#error-handling)
+17. [Logging](#logging)
+18. [Simple Frontend Interaction](#simple-frontend-interaction)
+19. [Fetch API](#fetch-api)
+20. [Running the Server](#running-the-server)
+21. [Minimal Full Example](#minimal-full-example)
+22. [The 15 Commands You Actually Use](#the-15-commands-you-actually-use)
+23. [Mental Model](#mental-model)
 
 ---
 
-# 1. Node Philosophy
+# Node Philosophy
 
-Node = **JavaScript runtime for servers**
-
-Core model :
-
-```
-Client (browser)
-      ↓
-HTTP request
-      ↓
-Node + Express server
-      ↓
-Route handler
-      ↓
-Response (HTML / JSON)
-```
-
-Example:
-
-```
-GET /simulation
-↓
-run simulation
-↓
-return JSON
-```
+Node = JavaScript runtime for servers.
 
 ---
 
-# 2. Project Setup
-
-Create project
+# Project Setup
 
 ```bash
 mkdir webapp
 cd webapp
-```
-
-Init node project
-
-```bash
 npm init -y
-```
-
-Install Express
-
-```bash
 npm install express
-```
-
-Install dev reload
-
-```bash
-npm install nodemon --save-dev
 ```
 
 ---
 
-# 3. Basic File Structure
+# File Structure
 
-Minimal structure:
-
-```
+```text
 webapp
 │
 ├── server.js
@@ -106,199 +64,76 @@ webapp
     └── api.js
 ```
 
-Meaning:
-
-```
-server.js → main backend
-public/ → frontend files
-routes/ → API logic
-```
-
 ---
 
-# 4. Core Node Concepts
-
-### Import modules
+# Core Node Concepts
 
 ```js
 const express = require("express")
-```
-
-### Create server
-
-```js
 const app = express()
-```
-
-### Listen on port
-
-```js
-app.listen(3000, () => {
-  console.log("Server running on port 3000")
-})
-```
-
----
-
-# 5. Express Basics
-
-Minimal server
-
-```js
-const express = require("express")
-
-const app = express()
-
-app.get("/", (req, res) => {
-  res.send("Hello world")
-})
 
 app.listen(3000)
 ```
 
-Run:
+---
 
-```
-node server.js
-```
+# Express Basics
 
-Open:
-
-```
-http://localhost:3000
+```js
+app.get("/", (req, res) => {
+  res.send("Hello world")
+})
 ```
 
 ---
 
-# 6. Routes
-
-Routes define **what happens when a URL is called**
-
-Syntax:
-
-```
-app.METHOD(PATH, HANDLER)
-```
-
-### GET route
+# Routes
 
 ```js
-app.get("/hello", (req, res) => {
-  res.send("hello")
-})
-```
-
-### POST route
-
-```js
-app.post("/data", (req, res) => {
-  res.send("received")
-})
-```
-
-### Multiple routes
-
-```js
-app.get("/users", handler)
-app.get("/simulation", handler)
-app.post("/run", handler)
+app.get("/hello", handler)
+app.post("/data", handler)
 ```
 
 ---
 
-# 7. Request / Response
+# Request / Response
 
-### Request (`req`)
-
-Contains:
-
-```
+```js
 req.params
 req.query
 req.body
-req.headers
 ```
 
-Example:
-
 ```js
-app.get("/user/:id", (req, res) => {
-  console.log(req.params.id)
-})
+res.send()
+res.json()
+res.status()
 ```
 
 ---
 
-### Response (`res`)
-
-Send data to client.
-
-```js
-res.send("hello")
-```
-
-Send JSON
-
-```js
-res.json({ result: 42 })
-```
-
-Send status
-
-```js
-res.status(404).send("not found")
-```
-
----
-
-# 8. JSON APIs
-
-Most webapps use **JSON API**
-
-Example route:
+# JSON APIs
 
 ```js
 app.get("/api/data", (req, res) => {
 
-  const data = {
+  res.json({
     agents: 100,
     step: 42
-  }
+  })
 
-  res.json(data)
 })
-```
-
-Client receives:
-
-```json
-{
-  "agents": 100,
-  "step": 42
-}
 ```
 
 ---
 
-# 9. Middleware
-
-Middleware = **functions executed before routes**
-
-Example:
+# Middleware
 
 ```js
 app.use(express.json())
 ```
 
-Purpose:
-
-```
-parse JSON
-log requests
-authentication
-```
-
-Example logger
+Example logger:
 
 ```js
 app.use((req, res, next) => {
@@ -309,83 +144,39 @@ app.use((req, res, next) => {
 
 ---
 
-# 10. Static Files
-
-Serve frontend files.
+# Static Files
 
 ```js
 app.use(express.static("public"))
 ```
 
-Now accessible:
-
-```
-public/index.html → /
-public/script.js → /script.js
-```
-
 ---
 
-# 11. Forms & POST Data
-
-Enable parsing:
+# Forms & POST Data
 
 ```js
 app.use(express.urlencoded({ extended: true }))
 ```
 
-Example form POST
+---
 
-```html
-<form action="/run" method="POST">
-  <input name="agents">
-  <button>Run</button>
-</form>
+# Query Parameters
+
+URL:
+
+```
+/simulation?agents=100
 ```
 
 Server:
 
 ```js
-app.post("/run", (req, res) => {
-
-  const agents = req.body.agents
-
-  res.send("Simulation started")
-})
+req.query.agents
 ```
 
 ---
 
-# 12. Query Parameters
-
-URL:
-
-```
-/simulation?agents=100&steps=50
-```
-
-Access:
-
-```js
-app.get("/simulation", (req, res) => {
-
-  const agents = req.query.agents
-  const steps = req.query.steps
-
-})
-```
-
----
-
-# 13. Environment Variables
-
-Used for:
-
-```
-ports
-API keys
-config
-```
+# Environment Variables
 
 Install:
 
@@ -393,62 +184,29 @@ Install:
 npm install dotenv
 ```
 
-Create:
-
-```
-.env
-```
-
-Example:
-
-```
-PORT=3000
-```
-
 Use:
 
 ```js
 require("dotenv").config()
 
-const port = process.env.PORT
+process.env.PORT
 ```
 
 ---
 
-# 14. Calling Python Scripts
-
-Very important for your use case.
-
-Node can run Python via **child_process**.
+# Calling Python Scripts
 
 ```js
 const { exec } = require("child_process")
-```
 
-Example:
-
-```js
-app.get("/run-sim", (req, res) => {
-
-  exec("python simulation.py", (err, stdout, stderr) => {
-
-    if (err) {
-      return res.send("error")
-    }
-
-    res.send(stdout)
-  })
-
+exec("python simulation.py", (err, stdout) => {
+  console.log(stdout)
 })
 ```
 
 ---
 
-# 15. Async / Await
-
-Node is **asynchronous**.
-
-Example:
+# Async / Await
 
 ```js
 app.get("/data", async (req, res) => {
@@ -456,44 +214,27 @@ app.get("/data", async (req, res) => {
   const result = await fetchSomething()
 
   res.json(result)
+
 })
 ```
 
 ---
 
-# 16. Error Handling
-
-Basic pattern:
+# Error Handling
 
 ```js
 try {
 
-  something()
-
 } catch (err) {
 
-  res.status(500).send("server error")
+  res.status(500).send("error")
 
 }
 ```
 
-Global handler:
-
-```js
-app.use((err, req, res, next) => {
-
-  console.error(err)
-
-  res.status(500).send("error")
-
-})
-```
-
 ---
 
-# 17. Logging
-
-Basic logging:
+# Logging
 
 ```js
 console.log("server started")
@@ -505,19 +246,11 @@ Better:
 npm install morgan
 ```
 
-Use:
-
-```js
-const morgan = require("morgan")
-
-app.use(morgan("dev"))
-```
-
 ---
 
-# 18. Simple Frontend Interaction
+# Simple Frontend Interaction
 
-HTML button:
+HTML:
 
 ```html
 <button onclick="runSim()">Run</button>
@@ -530,62 +263,49 @@ function runSim() {
 
   fetch("/run-sim")
     .then(res => res.text())
-    .then(data => {
-      console.log(data)
-    })
+    .then(data => console.log(data))
 
 }
 ```
 
 ---
 
-# 19. Fetch API
+# Fetch API
 
-GET request
+GET:
 
 ```js
 fetch("/api/data")
   .then(res => res.json())
-  .then(data => console.log(data))
 ```
 
-POST request
+POST:
 
 ```js
 fetch("/run", {
-
   method: "POST",
-
-  headers: {
-    "Content-Type": "application/json"
-  },
-
-  body: JSON.stringify({
-    agents: 100
-  })
-
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ agents: 100 })
 })
 ```
 
 ---
 
-# 20. Running the Server
+# Running the Server
 
-Run normally
-
-```
+```bash
 node server.js
 ```
 
-Run with auto reload
+Hot reload:
 
-```
+```bash
 npx nodemon server.js
 ```
 
 ---
 
-# 21. Minimal Full Example
+# Minimal Full Example
 
 server.js
 
@@ -594,45 +314,20 @@ const express = require("express")
 
 const app = express()
 
-app.use(express.json())
 app.use(express.static("public"))
 
 app.get("/api/hello", (req, res) => {
   res.json({ message: "hello" })
 })
 
-app.listen(3000, () => {
-  console.log("Server running")
-})
-```
-
-index.html
-
-```html
-<button onclick="test()">Test</button>
-
-<script src="script.js"></script>
-```
-
-script.js
-
-```js
-function test() {
-
-  fetch("/api/hello")
-    .then(r => r.json())
-    .then(data => console.log(data))
-
-}
+app.listen(3000)
 ```
 
 ---
 
-# 22. The 15 Commands You Actually Use
+# The 15 Commands You Actually Use
 
-Most webapps use mainly:
-
-```
+```text
 npm init -y
 npm install express
 node server.js
@@ -653,23 +348,16 @@ child_process.exec()
 
 ---
 
-# Mental Model (IMPORTANT)
+# Mental Model
 
-A webapp is **3 layers**
-
-```
-Frontend
-HTML + JS
-(buttons)
-
-↓ HTTP
-
-Backend
+```text
+Frontend (HTML + JS)
+      ↓
+HTTP request
+      ↓
 Node + Express
-(routes)
-
-↓ optional
-
+      ↓
 Python simulation
-Mesa / models
 ```
+
+---
